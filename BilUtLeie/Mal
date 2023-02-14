@@ -1,0 +1,120 @@
+-1 lag ett nyt projekt lag den som en Spring initializr
+        -velg java og maven trykk så neste
+        - kilkk på web, så velg spring web( for web)
+        - klikk SQL vel spring Data JPA og PosgresSQL Driver (for database)
+
+
+-2 legg til i pom.xml
+
+    <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependency>
+    			<groupId>org.springframework.boot</groupId>
+    			<artifactId>spring-boot-devtools</artifactId>
+    			<scope>runtime</scope>
+    			<optional>true</optional>
+    		</dependency>
+
+    		<dependency>
+    			<groupId>org.springframework.boot</groupId>
+    			<artifactId>spring-boot-starter-test</artifactId>
+    			<scope>test</scope>
+    		</dependency>
+
+    		<dependency>
+    			<groupId>javax.servlet</groupId>
+    			<artifactId>jstl</artifactId>
+    		</dependency>
+
+    		<dependency>
+    			<groupId>org.apache.tomcat.embed</groupId>
+    			<artifactId>tomcat-embed-jasper</artifactId>
+    		</dependency>
+
+    		<dependency>
+    			<groupId>org.springframework.boot</groupId>
+    			<artifactId>spring-boot-starter-validation</artifactId>
+    		</dependency>
+
+ -3 legg til i src.main.resources.application.properties
+    (husk og endre databasen til riktig og passor og bruker)
+
+ spring.jackson.serialization.indent-output=true
+
+
+ spring.mvc.view.prefix=WEB-INF/jsp/
+ spring.mvc.view.suffix=.jsp
+
+ spring.datasource.hikari.connection-timeout= 20000
+ spring.datasource.hikari.maximum-pool-size=5
+
+ spring.datasource.url=jdbc:postgresql://ider-database.westeurope.cloudapp.azure.com:5432/h600872
+ spring.datasource.username=h600872
+ spring.datasource.password=123
+
+ -4 lag app.url i application.properties
+
+    eks: for en nettside som heter kvitering
+    app.url.kvitering=kvitering
+
+
+ -5 Lag controllere mappe og controller classer til nettisdene du trenger.
+
+ start med
+ @Controller
+ @RequestMapping("${app.url.HtmlNavn}") // referer denne nettisden til app.url i application.properties.
+ public class HtmlNavnController {
+
+    //Hvis du skal ha noe fra en annen nettside.
+   @GetMapping
+   public String HtmlNavn (Model model){
+   model.addAttribute("ObjektNavn", new ObjektNavn()); //objekt er eks: bruker du ønsker å lage via denne nettisden
+   return "HtmlNavn" // denne gir deg HTml siden du lager.
+   }
+
+   //Valid for å sjekke om den følger regler.
+   //@Modelattribute for og få med objektet videre.
+   //Objektnavn= objekte som skal legges til.
+   //BindingResult = feilkode du trenger
+   //HttpSession lager en session for nettisden.
+   //RedirectAttribute for og ha en midlertidig lagrings plass for info
+
+   @PostMapping
+   public String posHtmlNavn(@Valid @ModelAttribute("ObjektNavn") Objektnavn objektnavn,
+                                    BindingResult bs, HttpSession session, RedirectAttributes ra){
+
+     if(bs.hasErrors()){
+     System.err.println("Error" + bs.getAllErrors());// for å sjekke etter feil
+     return "HtmlNavn"; // må alltid returnnere til kjema du er på eller det neste du skal til
+     }
+
+     //hvis du skal eks finne en person i en liste.
+     if(service.enMetode(parameter)){
+     ra.addFlashAttribute("parameter du er ute etter", metode);
+     // her brukes ra hvis du trenger en parameter til en metode
+     return "redirect:" + "HtmlNavn" //sender dette ut på siden.
+
+     service.metode();
+     session.setAttribute("ObjektNavn", objektnavn);
+
+     return "redirect:" + "nesteHtmlSide"
+   }
+
+ }
+
+
